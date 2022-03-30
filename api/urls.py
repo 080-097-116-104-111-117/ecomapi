@@ -18,14 +18,24 @@ from django.urls import path
 from django.views.generic import TemplateView
 from rest_framework.urlpatterns import format_suffix_patterns
 from apiapps import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html')),
     path('admin/', admin.site.urls),
     path('api/product/', views.productList.as_view()),
-    path('api/customer/', views.customerList.as_view()),
+    path('api/product/<int:id>/', views.productList.as_view()),
+    path('api/customer/',  views.customer_List, name="detail"),
+    path('api/customer/<int:id>/', views.customer_List, name="detail"),
+    path('api/customer/<int:id>', views.customer_List, name="detail"),
     path('api/order/', views.orderList.as_view()),
     path('api/catagory/', views.productCatagoryList.as_view()),
-]
+    path('api/register/', views.CustomUser.as_view()),
+    path('api/register/<int:id>/', views.CustomUser.as_view()),
+    path('api/register/<int:id>', views.CustomUser.as_view()),
+    path('api/login/', views.Login.as_view()),
+    path('api/logout/', views.Logout.as_view()),
+    path('api/user/', views.UsersView.as_view()),
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

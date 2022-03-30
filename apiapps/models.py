@@ -4,6 +4,61 @@ from django.db import models
 from django.db import models
 from setuptools import Require
 
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+
+class CustomAccountManager(BaseUserManager):
+
+    def create_superuser(self, email, user_name, default_address, mobile, password, **other_fields):
+
+        other_fields.setdefault('is_staff', True)
+        other_fields.setdefault('is_superuser', True)
+        other_fields.setdefault('is_active', True)
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True.')
+        if other_fields.get('is_superuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True.')
+
+        return self.create_user(email, user_name, default_address, mobile, password, **other_fields)
+
+    def create_user(self, email, user_name, default_address, mobile, password, **other_fields):
+
+        if not email:
+            raise ValueError(_('You must provide an email address'))
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, user_name=user_name,
+                          default_address= default_address, mobile = mobile, password = password, **other_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+
+class NewUser(AbstractBaseUser, PermissionsMixin):
+
+    email = models.EmailField(_('email address'), unique=True)
+    default_address = models.CharField(max_length=60, null=True, default=None, blank=True)
+    mobile = models.IntegerField(blank=True, null=True)
+    user_name = models.CharField(max_length=150, unique=True)
+    about = models.TextField(_(
+        'about'), max_length=500, blank=True)
+    start_date = models.DateTimeField(default=timezone.now)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+
+    objects = CustomAccountManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['user_name','default_address', 'mobile']
+
+    def __str__(self):
+        return self.user_name
+
 
         
 class ProductCategory(models.Model):
@@ -19,6 +74,7 @@ class product(models.Model):
     description = models.TextField(max_length=200)
     price = models.IntegerField(null=True, blank=True)
     offer_price = models.IntegerField(null=True, blank=True)
+    image = models.ImageField(upload_to ='images/', default=None, blank=True)
     stock = models.IntegerField(default=1)
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
 
@@ -61,10 +117,11 @@ class customer(models.Model):
 
 
 class order(models.Model):
-    product = models.ForeignKey(product, on_delete=models.CASCADE)
-    customer = models.ForeignKey(customer, on_delete=models.CASCADE)
+    product = models.ManyToManyField(product)
+    customer = models.ForeignKey(NewUser, related_name="user", on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     address = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.product.name
+        # return self.product.id
+        return self.customer.Name

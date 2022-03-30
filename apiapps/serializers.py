@@ -4,12 +4,23 @@ from . models import customer
 from . models import order
 from . models import ProductCategory
 
+from .models import NewUser
+
+
+class NewUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = '__all__'
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
 class productserializer(serializers.ModelSerializer):
 
     class Meta:
         model = product
         fields = '__all__'
+        depth = 1
 
 
 class userserializer(serializers.ModelSerializer):
@@ -23,7 +34,8 @@ class orderserializer(serializers.ModelSerializer):
 
     class Meta:
         model = order
-        fields = ['product_id', 'customer_id', 'quantity', 'address']
+        fields = '__all__'
+        #depth = 1
 
 
 class catagoryserializer(serializers.ModelSerializer):

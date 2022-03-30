@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 
+DATA_DIR = os.path.dirname(os.path.dirname(__file__))
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +28,32 @@ SECRET_KEY = 'django-insecure-ojrm*+#injx%6bdiu2uqb#xsb=nwh&h3b!p)*ma+5dbpoa#j=3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','www.cakes.manipur.ml','cakes.manipur.ml','172.105.36.218']
+
+#CORS_ORIGIN_ALLOW_ALL = False
+
+#CORS_ORIGIN_WHITELIST = [
+#    "http://localhost:3000",
+#    "http://127.0.0.1:3000",
+#    "http://localhost:3001",
+#    "http://127.0.0.1:3001",
+#]
+
+#CSRF_TRUSTED_ORIGINS = [
+#    "http://localhost:3000",
+#    "http://127.0.0.1:3000",
+#    "http://localhost:3001",
+#    "http://127.0.0.1:3001",
+#]
+
+#CORS_ALLOW_METHODS = [
+#    "DELETE",
+#    "GET",
+#    "OPTIONS",
+#    "PATCH",
+#    "POST",
+#    "PUT",
+#]
 
 
 # Application definition
@@ -40,6 +67,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apiapps',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -50,6 +78,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+]
+
+MIDDLEWARE_CLASSES = [
+
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "corsheaders.middleware.CorsPostCsrfMiddleware",
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -120,14 +157,59 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
+STATIC_ROOT = os.path.join(DATA_DIR, 'static')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/build/static')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'api', 'static'),
+)
 
-]
+
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+#STATIC_URL = 'static/'
+
+#STATICFILES_DIRS = [
+ #   os.path.join(BASE_DIR, 'static'),
+#]
+#STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+#CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:3000",
+#    "http://127.0.0.1:3000",
+#    "http://localhost:3001",
+#    "http://127.0.0.1:3001",
+#]
+
+#CORS_ALLOW_METHODS = [
+#    "DELETE",
+#    "GET",
+#    "OPTIONS",
+#    "PATCH",
+#    "POST",
+#    "PUT",
+#]
+
+#CORS_ALLOW_HEADERS = (
+#    'accept',
+#    'accept-encoding',
+#    'authorization',
+#    'content-type',
+#    'dnt',
+#    'origin',
+#    'user-agent',
+#    'x-csrftoken',
+#    'x-requested-with',
+#)
+
+AUTH_USER_MODEL = 'apiapps.NewUser'
