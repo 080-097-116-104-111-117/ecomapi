@@ -1,8 +1,9 @@
+from tokenize import Name
 from django.db import models
 
-# Create your models here.
-from django.db import models
 from setuptools import Require
+from rest_framework import serializers
+
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -60,14 +61,32 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
         return self.user_name
 
 
+# class NameUpperField(models.CharField):
+#     def __init__(self, *args, **kwargs):
+#         # self.is_uppercase = kwargs.pop('uppercase', False)
+#         super(NameUpperField, self).__init__(*args, **kwargs)
+    
+#     def getValue(self, model_instance, add):
+#         value = getattr(model_instance, self.attname, None)
+#         if value:
+#             value = value.upper()
+#             print(value)
+#             setattr(model_instance, self.attname, value)
+#             return value
+        
+#         else:
+#             return super(NameUpperField, self).getValue(model_instance, add)
         
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, default=None, blank=True, unique=True)
+    # name = NameUpperField(max_length=50)
     description = models.TextField(max_length=200)
     
 
     def __str__(self):
-        return self.name
+        return self.name[0].upper() + self.name[1:]
+
+
 
 class product(models.Model):
     name = models.CharField(max_length=50)

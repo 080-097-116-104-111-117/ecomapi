@@ -212,12 +212,36 @@ class orderList(APIView):
 
 class productCatagoryList(APIView):
 
-    def get(self, request):
+    def get(self, request, id =None):
+        if id:
+            product1 = ProductCategory.objects.get(id=id)
+            serializer = catagoryserializer(product1, context={"request":request})
+            return Response(serializer.data)
+
         product1 = ProductCategory.objects.all()
         serializer = catagoryserializer(product1, many=True)
         # print(serializer.data)
         return Response(serializer.data)
 
     def post(self, request):
-        pass
+        serializer = catagoryserializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, id):
+        product1 = ProductCategory.objects.filter(id=id).delete()
+        # serializer = catagoryserializer(product1, many=True)
+        return Response({
+            "message" : "success"
+        })
+    
+    def put(self, request, id):
+        product1 = ProductCategory.objects.get(id=id)
+        serializer = catagoryserializer(product1, data=request.data)
+        if serializer.is_valid(): 
+            serializer.save() 
+            # print(serializer.data.name)
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
