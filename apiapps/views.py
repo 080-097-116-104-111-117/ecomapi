@@ -9,6 +9,9 @@ from rest_framework import status
 from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView
+from django.contrib.auth.hashers import  make_password, check_password
+
+print(make_password("123"))
 
 from . models import product
 from . models import customer
@@ -48,7 +51,12 @@ class CustomUser(APIView):
     def post(self, request):
         serializer = NewUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # serializer.set_password(request['password'])
+        serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
+        print("here")
+        print(serializer.validated_data['password'])
         serializer.save()
+        # print(serializer.data)
         return Response(serializer.data)
 
 class Login(APIView):
@@ -66,6 +74,7 @@ class Login(APIView):
 
         payload = {
             'id' : user.id,
+            'username' : user.user_name,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days = 365),
             'iat' : datetime.datetime.utcnow()
         }
@@ -74,26 +83,27 @@ class Login(APIView):
 
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
-        response = Response()
+        # response = Response()
         
-        response.set_cookie(key='token', value=token, httponly=True)
+        # response.set_cookie(key='token', value=token, httponly=True)
 
-        response.data = {
-            'token' : token
-        }
-
-        return response
-
-        # return Response({
+        # response.data = {
         #     'token' : token
-        # })
+        # }
+
+        # return response
+
+        return Response({
+            'token' : token
+        })
  
 
 class UsersView(APIView):
     
     def get(self, request):
-        token = request.COOKIES.get('token')
-        # print(request.data)
+        token = request.data.get('token')
+        print(request.data)
+        print(token)
 
         if not token:
             raise AuthenticationFailed('[Unauthenticated]')
@@ -112,7 +122,7 @@ class UsersView(APIView):
 class Logout(APIView):
     def post(self, request):
         response = Response()
-        response.delete_cookie('token')
+        response.DELETE('token')
         response.data = {
             'massage': 'success'
         }
