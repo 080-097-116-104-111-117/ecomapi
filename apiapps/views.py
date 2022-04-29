@@ -10,6 +10,8 @@ from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView
 
+from django.contrib.auth.hashers import  make_password
+
 from . models import product
 from . models import customer
 from . models import order
@@ -48,6 +50,8 @@ class CustomUser(APIView):
     def post(self, request):
         serializer = NewUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
+        print(serializer.validated_data['password'])
         serializer.save()
         return Response(serializer.data)
 
@@ -74,19 +78,11 @@ class Login(APIView):
 
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
-        response = Response()
-        
-        response.set_cookie(key='token', value=token, httponly=True)
+ 
 
-        response.data = {
+        return Response({
             'token' : token
-        }
-
-        return response
-
-        # return Response({
-        #     'token' : token
-        # })
+        })
  
 
 class UsersView(APIView):
@@ -138,6 +134,8 @@ class productList(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
 
 @api_view(['GET', 'POST'])
 def customer_List(request, id =None):
@@ -219,5 +217,8 @@ class productCatagoryList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        pass
+        serializer = catagoryserializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
