@@ -209,12 +209,21 @@ class orderList(APIView):
 
 
 class productCatagoryList(APIView):
-
-    def get(self, request):
+    def get_queryset(self):
         product1 = ProductCategory.objects.all()
-        serializer = catagoryserializer(product1, many=True)
+        return product1
+
+    def get(self, request, id =None):
+        if id:
+            product1 = ProductCategory.objects.get(id=id)
+            serializer = catagoryserializer(product1, context={"request":request})
+            return Response(serializer.data)
+
+        product1 = self.get_queryset()
+        serializer = catagoryserializer(product1, many=True, context={"request":request})
         # print(serializer.data)
         return Response(serializer.data)
+
 
     def post(self, request):
         serializer = catagoryserializer(data=request.data)

@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-ojrm*+#injx%6bdiu2uqb#xsb=nwh&h3b!p)*ma+5dbpoa#j=3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','www.cakes.manipur.ml','cakes.manipur.ml','172.105.36.218']
+ALLOWED_HOSTS = ['localhost','www.cakes.manipur.ml','cakes.manipur.ml','172.105.36.218','127.0.0.1']
 
 #CORS_ORIGIN_ALLOW_ALL = False
 
